@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SmartPort Telemetrer</string>
+    <string name="connect_button_title">Connect</string>
+    <string name="button_select_bt_title">Select BT module</string>
+    <string name="error_no_bluetooth">This device does not have Bluetooth, aborting</string>
+    <string name="title_activity_bluetooth_select">BluetoothSelectActivity</string>
+    <string name="bt_device_selected">Bluetooth device selected</string>
+    <string name="bt_device_has_to_be_enable">Bluetooth has to be enabled to continue</string>
+</resources>
