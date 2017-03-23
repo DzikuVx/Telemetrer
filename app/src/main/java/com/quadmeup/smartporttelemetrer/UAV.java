@@ -6,17 +6,17 @@ package com.quadmeup.smartporttelemetrer;
 
 public class UAV {
 
-    long batteryVoltage;
+    float batteryVoltage;
     long cellVoltage;
     long RSSI;
     long relativeAltitude;
     long absoluteAltitude;
 
-    public long getBatteryVoltage() {
+    public float getBatteryVoltage() {
         return batteryVoltage;
     }
 
-    public void setBatteryVoltage(long batteryVoltage) {
+    public void setBatteryVoltage(float batteryVoltage) {
         this.batteryVoltage = batteryVoltage;
     }
 

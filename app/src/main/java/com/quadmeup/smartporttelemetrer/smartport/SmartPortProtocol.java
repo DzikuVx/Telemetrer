@@ -16,7 +16,8 @@ public class SmartPortProtocol implements ProtocolDecoder {
         SENSOR_ID,
         DATA_FRAME_START,
         DATA_TYPE,
-        DATE_VALUE
+        DATE_VALUE,
+        DATA_CRC
     }
 
     private int byteIndex = 0;
@@ -54,14 +55,12 @@ public class SmartPortProtocol implements ProtocolDecoder {
     @Override
     public void put(int data) {
 
-        if (state == ProtocolState.NONE && data == 0x78) {
+        if (state == ProtocolState.NONE && data == 0x7e) {
             state = ProtocolState.FRAME_START;
             crc = 0;
-            computeCrc(data);
         } else if (state == ProtocolState.FRAME_START) {
             sensorId = data;
             state = ProtocolState.SENSOR_ID;
-            computeCrc(data);
         } else if (state == ProtocolState.SENSOR_ID) {
             if (data == 0x10) {
                 state = ProtocolState.DATA_FRAME_START;
@@ -96,7 +95,7 @@ public class SmartPortProtocol implements ProtocolDecoder {
             }
         } else if (state == ProtocolState.DATE_VALUE) {
 
-            if (crc == data) {
+            if (255 - crc == data) {
                 /*
                  * CRC matches, we can send data
                  */
@@ -106,7 +105,9 @@ public class SmartPortProtocol implements ProtocolDecoder {
             /*
              * Frame processing finished, we are ready to process next frame
              */
-            state = ProtocolState.NONE;
+            state = ProtocolState.DATA_CRC;
+        } else if (state == ProtocolState.DATA_CRC) {
+            reset();
         } else {
             reset();
         }

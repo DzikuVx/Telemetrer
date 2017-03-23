@@ -29,7 +29,15 @@ public class SmartPortReceiver {
              * FVAS sensor
              */
             case 0x0210:
-                uav.setBatteryVoltage(getUnsignedInt(dataValue));
+                uav.setBatteryVoltage((float)getUnsignedInt(dataValue) / 100);
+
+                break;
+
+            /*
+             * Heading
+             */
+            case 0x0840:
+                uav.setBatteryVoltage((float)getUnsignedInt(dataValue) / 100);
 
                 break;
 
@@ -42,7 +50,7 @@ public class SmartPortReceiver {
     {
         long tmp = 0;
         for (int i = 0; i < data.length; i++) {
-            tmp += data[i] << (8 * (data.length -1 - i));
+            tmp += data[i] << (8 * i);
         }
         return tmp;
     }
