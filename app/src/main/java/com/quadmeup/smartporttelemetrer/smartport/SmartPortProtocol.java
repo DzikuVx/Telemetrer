@@ -23,8 +23,8 @@ public class SmartPortProtocol implements ProtocolDecoder {
     private int byteIndex = 0;
     private ProtocolState state = ProtocolState.NONE;
     private int sensorId;
-    private byte[] dataType;
-    private byte[] dataValue;
+    private int[] dataType;
+    private int[] dataValue;
     private long crc;
 
     SmartPortReceiver receiver;
@@ -65,14 +65,14 @@ public class SmartPortProtocol implements ProtocolDecoder {
             if (data == 0x10) {
                 state = ProtocolState.DATA_FRAME_START;
                 byteIndex = 0;
-                dataType = new byte[2];
+                dataType = new int[2];
                 computeCrc(data);
             } else {
                 reset();
             }
         } else if (state == ProtocolState.DATA_FRAME_START) {
             //Process 2 data type bytes
-            dataType[byteIndex] = (byte)data;
+            dataType[byteIndex] = data;
 
             computeCrc(data);
 
@@ -80,11 +80,11 @@ public class SmartPortProtocol implements ProtocolDecoder {
             if (byteIndex == 2) {
                 state = ProtocolState.DATA_TYPE;
                 byteIndex = 0;
-                dataValue = new byte[4];
+                dataValue = new int[4];
             }
         } else if (state == ProtocolState.DATA_TYPE) {
             //Process 4 data bytes
-            dataValue[byteIndex] = (byte) data;
+            dataValue[byteIndex] = data;
 
             computeCrc(data);
 
@@ -95,7 +95,7 @@ public class SmartPortProtocol implements ProtocolDecoder {
             }
         } else if (state == ProtocolState.DATE_VALUE) {
 
-            if (255 - crc == data) {
+            if (0xff - crc == data) {
                 /*
                  * CRC matches, we can send data
                  */

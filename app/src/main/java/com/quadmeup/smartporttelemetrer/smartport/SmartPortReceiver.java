@@ -6,9 +6,6 @@ package com.quadmeup.smartporttelemetrer.smartport;
 
 import com.quadmeup.smartporttelemetrer.UAV;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 public class SmartPortReceiver {
 
     private UAV uav;
@@ -17,10 +14,9 @@ public class SmartPortReceiver {
         this.uav = uav;
     }
 
-    void put(int sensor, byte[] dataType, byte[] dataValue) {
+    void put(int sensor, int[] dataType, int[] dataValue) {
 
-        int type = (int) getUnsignedInt(dataType);
-        long value;
+        int type = (int) getInt(dataType);
 
 
         switch (type) {
@@ -29,37 +25,48 @@ public class SmartPortReceiver {
              * FVAS sensor
              */
             case 0x0210:
-                uav.setBatteryVoltage((float)getUnsignedInt(dataValue) / 100);
-
+                uav.setBatteryVoltage((float) getInt(dataValue) / 100);
                 break;
 
             /*
              * Heading
              */
             case 0x0840:
-                uav.setBatteryVoltage((float)getUnsignedInt(dataValue) / 100);
-
+                uav.setHeading(getInt(dataValue) / 100);
                 break;
 
+            /*
+             * ACC_X
+             */
+            case 0x0700:
+                uav.setAccX((float) getInt(dataValue) / 100);
+                break;
+
+            /*
+             * ACC_Y
+             */
+            case 0x0710:
+                uav.setAccY((float) getInt(dataValue) / 100);
+                break;
+
+            /*
+             * ACC_Z
+             */
+            case 0x0720:
+                uav.setAccZ((float) getInt(dataValue) / 100);
+                break;
 
         }
 
     }
 
-    private static long getUnsignedInt(byte[] data)
+    private long getInt(int[] data)
     {
         long tmp = 0;
         for (int i = 0; i < data.length; i++) {
             tmp += data[i] << (8 * i);
         }
         return tmp;
-    }
-
-    private static long getSignedInt(byte[] data)
-    {
-        ByteBuffer bb = ByteBuffer.wrap(data);
-        bb.order(ByteOrder.BIG_ENDIAN);
-        return bb.getInt();
     }
 
 }

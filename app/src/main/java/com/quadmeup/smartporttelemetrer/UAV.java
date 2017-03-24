@@ -7,6 +7,12 @@ package com.quadmeup.smartporttelemetrer;
 public class UAV {
 
     float batteryVoltage;
+
+    float accX;
+    float accY;
+    float accZ;
+
+    long heading;
     long cellVoltage;
     long RSSI;
     long relativeAltitude;
@@ -50,5 +56,37 @@ public class UAV {
 
     public void setAbsoluteAltitude(long absoluteAltitude) {
         this.absoluteAltitude = absoluteAltitude;
+    }
+
+    public long getHeading() {
+        return heading;
+    }
+
+    public void setHeading(long heading) {
+        this.heading = heading;
+    }
+
+    public float getAccX() {
+        return accX;
+    }
+
+    public void setAccX(float accX) {
+        this.accX = accX;
+    }
+
+    public float getAccY() {
+        return accY;
+    }
+
+    public void setAccY(float accY) {
+        this.accY = accY;
+    }
+
+    public float getAccZ() {
+        return accZ;
+    }
+
+    public void setAccZ(float accZ) {
+        this.accZ = accZ;
     }
 }
