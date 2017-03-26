@@ -39,14 +39,6 @@ public class BluetoothService {
         return instance;
     }
 
-    private enum ConnectionState {
-        DISCONNECTED,
-        CONNECTING,
-        SOCKET_CONNECTED,
-        CONNECTED,
-        CONNECTION_FAILED
-    }
-
     private BluetoothService() {
 
     }
@@ -95,8 +87,12 @@ public class BluetoothService {
         connectionState = ConnectionState.DISCONNECTED;
     }
 
-    public String getConnectionState() {
+    public String getConnectionStateAsString() {
         return connectionState.toString();
+    }
+
+    public ConnectionState getConnectionState() {
+        return connectionState;
     }
 
     private class ConnectThread extends Thread {

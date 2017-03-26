@@ -5,26 +5,25 @@
 package com.quadmeup.smartporttelemetrer.activity;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.AsyncTask;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.quadmeup.smartporttelemetrer.BluetoothManager;
-import com.quadmeup.smartporttelemetrer.BluetoothService;
 import com.quadmeup.smartporttelemetrer.DataProvider;
-import com.quadmeup.smartporttelemetrer.ProtocolDecoder;
+import com.quadmeup.smartporttelemetrer.DataService;
 import com.quadmeup.smartporttelemetrer.R;
-import com.quadmeup.smartporttelemetrer.UAV;
-import com.quadmeup.smartporttelemetrer.smartport.SmartPortProtocol;
-import com.quadmeup.smartporttelemetrer.smartport.SmartPortReceiver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -33,9 +32,30 @@ public class ConnectActivity extends AppCompatActivity {
     static final private String TAG = "SPBT";
 
     private BluetoothManager bluetoothManager;
-    private BluetoothService bluetoothService;
 
     static int REQUEST_ENABLE_BT = 7652;
+
+    private DataService mService;
+    boolean mBound = false;
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            DataService.DataServiceBinder binder = (DataService.DataServiceBinder) service;
+            mService = binder.getService();
+            Log.i(TAG, "Service connected");
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 
     TextView deviceName;
     TextView stateLabel;
@@ -53,7 +73,9 @@ public class ConnectActivity extends AppCompatActivity {
                 deviceName.setText(value);
             }
 
-            stateLabel.setText(bluetoothService.getConnectionState());
+            if (mService != null) {
+                stateLabel.setText(mService.getConnectionState().toString());
+            }
 
             super.onPostExecute(result);
         }
@@ -79,17 +101,6 @@ public class ConnectActivity extends AppCompatActivity {
             return;
         }
 
-        UAV uav = new UAV();
-
-        SmartPortReceiver smartportReceiver = new SmartPortReceiver(uav);
-
-        ArrayList<ProtocolDecoder> decoders = new ArrayList<>();
-        decoders.add(new SmartPortProtocol(smartportReceiver));
-
-        bluetoothService = BluetoothService.getInstance();
-        bluetoothService.setBluetoothAdapter(bluetoothManager.getAdapter());
-        bluetoothService.setDecoders(decoders);
-
         deviceName = (TextView) findViewById(R.id.device_name);
         stateLabel = (TextView) findViewById(R.id.state_label);
 
@@ -102,7 +113,7 @@ public class ConnectActivity extends AppCompatActivity {
                 buttonConnect.setVisibility(View.VISIBLE);
                 buttonDisconnect.setVisibility(View.INVISIBLE);
 
-                bluetoothService.disconnect();
+                mService.disconnect();
             }
         });
 
@@ -120,8 +131,7 @@ public class ConnectActivity extends AppCompatActivity {
                 buttonDisconnect.setVisibility(View.VISIBLE);
 
                 DataProvider dataProvider = new DataProvider(getApplicationContext());
-                bluetoothService.connect(dataProvider.getString(DataProvider.KEY_BT_MAC));
-
+                mService.connect(dataProvider.getString(DataProvider.KEY_BT_MAC));
             }
         });
 
@@ -144,7 +154,24 @@ public class ConnectActivity extends AppCompatActivity {
             }
         };
         timer.schedule(doAsynchronousTask, 0, 200); //execute in every 50000 ms
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Bind to LocalService
+        Intent intent = new Intent(this, DataService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
     }
 
     @Override

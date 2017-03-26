@@ -24,6 +24,7 @@
             android:label="@string/title_activity_bluetooth_select"
             android:parentActivityName=".activity.ConnectActivity"
             ></activity>
+        <service android:name=".DataService" />
     </application>
 
 </manifest>
