@@ -20,10 +20,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.quadmeup.smartporttelemetrer.BluetoothManager;
+import com.quadmeup.smartporttelemetrer.ConnectionState;
 import com.quadmeup.smartporttelemetrer.DataProvider;
 import com.quadmeup.smartporttelemetrer.DataService;
 import com.quadmeup.smartporttelemetrer.R;
 
+import java.text.DecimalFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -59,6 +61,9 @@ public class ConnectActivity extends AppCompatActivity {
 
     TextView deviceName;
     TextView stateLabel;
+    TextView vfas;
+    Button buttonDisconnect;
+    Button buttonConnect;
 
     private class PopulateUI extends AsyncTask<String, String, String> {
 
@@ -74,7 +79,20 @@ public class ConnectActivity extends AppCompatActivity {
             }
 
             if (mService != null) {
-                stateLabel.setText(mService.getConnectionState().toString());
+
+                ConnectionState connectionState = mService.getConnectionState();
+
+                stateLabel.setText(connectionState.toString());
+                vfas.setText(new DecimalFormat("#.##").format((double)mService.getUav().getBatteryVoltage()));
+
+                if (connectionState.equals(ConnectionState.DISCONNECTED) || connectionState.equals(ConnectionState.CONNECTION_FAILED)) {
+                    buttonConnect.setVisibility(View.VISIBLE);
+                    buttonDisconnect.setVisibility(View.INVISIBLE);
+                } else {
+                    buttonConnect.setVisibility(View.INVISIBLE);
+                    buttonDisconnect.setVisibility(View.VISIBLE);
+                }
+
             }
 
             super.onPostExecute(result);
@@ -103,9 +121,9 @@ public class ConnectActivity extends AppCompatActivity {
 
         deviceName = (TextView) findViewById(R.id.device_name);
         stateLabel = (TextView) findViewById(R.id.state_label);
-
-        final Button buttonDisconnect = (Button) findViewById(R.id.button_disconnect);
-        final Button buttonConnect = (Button) findViewById(R.id.button_connect);
+        vfas = (TextView) findViewById(R.id.vfas);
+        buttonDisconnect = (Button) findViewById(R.id.button_disconnect);
+        buttonConnect = (Button) findViewById(R.id.button_connect);
 
         buttonDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
