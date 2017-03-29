@@ -49,13 +49,14 @@ public class ConnectActivity extends AppCompatActivity {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             DataService.DataServiceBinder binder = (DataService.DataServiceBinder) service;
             mService = binder.getService();
-            Log.i(TAG, "Service connected");
+            Log.i(TAG, "DataService connected in ConnectActivity");
             mBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
             mBound = false;
+            Log.i(TAG, "DataService unbinded in ConnectActivity");
         }
     };
 
@@ -183,13 +184,21 @@ public class ConnectActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
+
         // Unbind from the service
         if (mBound) {
+            Log.i(TAG, "ConnectActivity destroyed");
             unbindService(mConnection);
             mBound = false;
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
     }
 
     @Override

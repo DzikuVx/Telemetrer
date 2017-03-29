@@ -6,9 +6,15 @@ package com.quadmeup.smartporttelemetrer.smartport;
 
 import com.quadmeup.smartporttelemetrer.UAV;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SmartPortReceiver {
 
     private UAV uav;
+
+    private Map<Integer, DataValueObject> values = new HashMap();
+    private Map<Integer, DataTypeObject> types = SmartPortDataType.getDataTypeMap();
 
     public SmartPortReceiver(UAV uav) {
         this.uav = uav;
@@ -18,6 +24,10 @@ public class SmartPortReceiver {
 
         int type = (int) getInt(dataType);
 
+        if (types.containsKey(type)) {
+            values.remove(type);
+            values.put(type, new DataValueObject(types.get(type), getInt(dataValue)));
+        }
 
         switch (type) {
 
