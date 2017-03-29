@@ -6,4 +6,10 @@
     <string name="title_activity_bluetooth_select">BluetoothSelectActivity</string>
     <string name="bt_device_selected">Bluetooth device selected</string>
     <string name="bt_device_has_to_be_enable">Bluetooth has to be enabled to continue</string>
+    <string name="title_activity_raw_data">RawDataActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 </resources>

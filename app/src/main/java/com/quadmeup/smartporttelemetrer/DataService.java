@@ -13,10 +13,13 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.quadmeup.smartporttelemetrer.smartport.DataValueObject;
 import com.quadmeup.smartporttelemetrer.smartport.SmartPortProtocol;
 import com.quadmeup.smartporttelemetrer.smartport.SmartPortReceiver;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class DataService extends Service {
 
@@ -84,6 +87,10 @@ public class DataService extends Service {
 
     public UAV getUav() {
         return uav;
+    }
+
+    public Map<Integer, DataValueObject> getRawDataValues() {
+        return smartportReceiver.getValues();
     }
 
 }

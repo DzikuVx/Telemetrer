@@ -37,25 +37,25 @@ public class ConnectActivity extends AppCompatActivity {
 
     static int REQUEST_ENABLE_BT = 7652;
 
-    private DataService mService;
-    boolean mBound = false;
+    private DataService dataService;
+    boolean dataServiceBound = false;
 
     /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection dataServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             DataService.DataServiceBinder binder = (DataService.DataServiceBinder) service;
-            mService = binder.getService();
+            dataService = binder.getService();
             Log.i(TAG, "DataService connected in ConnectActivity");
-            mBound = true;
+            dataServiceBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
+            dataServiceBound = false;
             Log.i(TAG, "DataService unbinded in ConnectActivity");
         }
     };
@@ -79,12 +79,12 @@ public class ConnectActivity extends AppCompatActivity {
                 deviceName.setText(value);
             }
 
-            if (mService != null) {
+            if (dataService != null) {
 
-                ConnectionState connectionState = mService.getConnectionState();
+                ConnectionState connectionState = dataService.getConnectionState();
 
                 stateLabel.setText(connectionState.toString());
-                vfas.setText(new DecimalFormat("#.##").format((double)mService.getUav().getBatteryVoltage()));
+                vfas.setText(new DecimalFormat("#.##").format((double) dataService.getUav().getBatteryVoltage()));
 
                 if (connectionState.equals(ConnectionState.DISCONNECTED) || connectionState.equals(ConnectionState.CONNECTION_FAILED)) {
                     buttonConnect.setVisibility(View.VISIBLE);
@@ -132,7 +132,7 @@ public class ConnectActivity extends AppCompatActivity {
                 buttonConnect.setVisibility(View.VISIBLE);
                 buttonDisconnect.setVisibility(View.INVISIBLE);
 
-                mService.disconnect();
+                dataService.disconnect();
             }
         });
 
@@ -150,7 +150,14 @@ public class ConnectActivity extends AppCompatActivity {
                 buttonDisconnect.setVisibility(View.VISIBLE);
 
                 DataProvider dataProvider = new DataProvider(getApplicationContext());
-                mService.connect(dataProvider.getString(DataProvider.KEY_BT_MAC));
+                dataService.connect(dataProvider.getString(DataProvider.KEY_BT_MAC));
+
+                /*
+                Open RawDataActivity since it will be populated
+                 */
+                Intent intent = new Intent(getApplicationContext(), RawDataActivity.class);
+                startActivity(intent);
+
             }
         });
 
@@ -180,7 +187,7 @@ public class ConnectActivity extends AppCompatActivity {
         super.onStart();
         // Bind to LocalService
         Intent intent = new Intent(this, DataService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        bindService(intent, dataServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -188,10 +195,10 @@ public class ConnectActivity extends AppCompatActivity {
         super.onDestroy();
 
         // Unbind from the service
-        if (mBound) {
+        if (dataServiceBound) {
             Log.i(TAG, "ConnectActivity destroyed");
-            unbindService(mConnection);
-            mBound = false;
+            unbindService(dataServiceConnection);
+            dataServiceBound = false;
         }
     }
 

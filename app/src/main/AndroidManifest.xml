@@ -22,9 +22,19 @@
         <activity
             android:name=".activity.BluetoothSelectActivity"
             android:label="@string/title_activity_bluetooth_select"
-            android:parentActivityName=".activity.ConnectActivity"
-            ></activity>
+            android:parentActivityName=".activity.ConnectActivity" />
+
         <service android:name=".DataService" />
+
+        <activity
+            android:name=".activity.RawDataActivity"
+            android:label="@string/title_activity_raw_data"
+            android:parentActivityName=".activity.ConnectActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.quadmeup.smartporttelemetrer.activity.ConnectActivity" />
+        </activity>
     </application>
 
 </manifest>

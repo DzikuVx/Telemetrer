@@ -79,4 +79,8 @@ public class SmartPortReceiver {
         return tmp;
     }
 
+    public Map<Integer, DataValueObject> getValues() {
+        return values;
+    }
+
 }
